@@ -1,0 +1,98 @@
+#!/bin/bash
+
+# Colores para la interfaz
+red='\e[1;31m'
+green='\e[1;32m'
+blue='\e[1;34m'
+cyan='\e[1;36m'
+white='\e[1;37m'
+yellow='\e[1;33m'
+
+clear
+
+# Banner de Inicio
+echo -e "${cyan}"
+echo "  ____  _   _ ____    ____  _____ ____ "
+echo " |  _ \| \ | / ___|  / ___|| ____/ ___|"
+echo " | | | |  \| \___ \  \___ \|  _|| |    "
+echo " | |_| | |\  |___) |  ___) | |__| |___ "
+echo " |____/|_| \_|____/  |____/|_____\____|"
+echo -e "${white}          echa por JVS${red}"
+echo "---------------------------------------"
+echo -e "${yellow}       SISTEMA DE ACCESO RESTRINGIDO"
+echo -e "${red}---------------------------------------${white}"
+
+# Sistema de Login
+echo -ne "${blue}[+] Usuario: ${white}"
+read user_input
+echo -ne "${blue}[+] Contraseña: ${white}"
+read -s pass_input
+echo ""
+
+# Validación de Credenciales
+if [[ "$user_input" == "ADMIN" && "$pass_input" == "DNS SEC" ]]; then
+    status="ADMINISTRADOR"
+    echo -e "\n${green}[✔] Acceso concedido como $status${white}"
+elif [[ "$user_input" == "JVS login" && "$pass_input" == "JVS2011SECJAVIC#SOCITY" ]]; then
+    status="DUEÑO (JVS)"
+    echo -e "\n${green}[✔] Acceso Maestro concedido: Bienvenido $status${white}"
+else
+    echo -e "\n${red}[✘] Error: Credenciales incorrectas. Abortando...${white}"
+    exit 1
+fi
+
+sleep 2
+clear
+
+# Interfaz Principal
+function menu(){
+    echo -e "${cyan}DNS SEC - Pentesting Suite${white}"
+    echo -e "Estado: ${green}$status${white}"
+    echo "---------------------------------------"
+    echo -e "${blue}Módulos de Ataque:${white}"
+    echo "1) Escaneo de Puertos y Servicios (Nmap)"
+    echo "2) Análisis de Vulnerabilidades Web"
+    echo "3) Fuerza Bruta (Hydra/Medusa)"
+    echo "4) Inyección SQL Automatizada"
+    echo "5) Extracción de Subdominios (OSINT)"
+    echo "6) Generación de Payloads"
+    echo "7) Denegación de Servicio (DoS/DDoS)"
+    echo "8) Sniffing y MITM"
+    echo "9) Salir"
+    echo -ne "\n${cyan}DNS-SEC > ${white}"
+    read opt
+}
+
+while true; do
+    menu
+    case $opt in
+        1)
+            echo -n "Objetivo: "
+            read target
+            nmap -sV -A $target
+            ;;
+        2)
+            echo -n "URL: "
+            read url
+            nmap --script vuln $url
+            ;;
+        5)
+            echo -n "Dominio: "
+            read dom
+            curl -s https://crt.sh/\?q\=%.$dom\&output\=json | jq -r '.[].name_value' | sort -u
+            ;;
+        7)
+            echo -e "${red}[!] Cargando módulo de inundación...${white}"
+            # Script DoS integrado aquí
+            ;;
+        9)
+            echo "Cerrando DNS SEC..."
+            exit 0
+            ;;
+        *)
+            echo "Opción inválida."
+            sleep 1
+            clear
+            ;;
+    esac
+done
